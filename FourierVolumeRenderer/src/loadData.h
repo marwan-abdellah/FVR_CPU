@@ -1,21 +1,5 @@
 #include "fourierVolumeRender.h"
 #include "Shared.h"
-void InitData()
-{
-	printf("Loading DataSet ... \n"); 
-	if (mPath == 0) 
-    {
-		// sprintf("Error Finding File '%s' ... \n", mPath); 
-		exit(0); 
-	}
-	 
-	// Loading Data from File 
-	mVolumeData = LoadRawFile(mPath, mVolumeSizeBytes); 
-	
-	printf("	DataSet Loaded Successfully \n\n");
-}
-
-
 
 
 volume* loadVolume(char* volFile, char* hdrFile)
@@ -74,6 +58,30 @@ volume* loadVolume(char* volFile, char* hdrFile)
 
     return iVolume;
 }
+
+
+void InitData()
+{
+	printf("Loading DataSet ... \n"); 
+	if (mPath == 0) 
+    {
+		// sprintf("Error Finding File '%s' ... \n", mPath); 
+		exit(0); 
+	}
+	 
+	// Loading Data from File 
+	mVolumeData = LoadRawFile(mPath, mVolumeSizeBytes); 
+
+
+    volume* iVolume = loadVolume(mPath, mPath);
+    mVolumeData =  iVolume->ptrVol_char;
+	
+	printf("	DataSet Loaded Successfully \n\n");
+}
+
+
+
+
 
 // Loading Raw Data 
 char* LoadRawFile(char* fFileName, size_t fSize)
