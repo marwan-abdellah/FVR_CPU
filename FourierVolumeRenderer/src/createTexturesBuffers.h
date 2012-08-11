@@ -84,46 +84,6 @@ void PrepareFBO()
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mSliceTextureSrcID, 0);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-	////////////////////////////////////////////////////////////////////////// -1
-	// Framebuffer Object 
-	glGenFramebuffersEXT(1, &mFBO_ID_N1);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID_N1);
-
-	// Attach Texture to FBO Color Attachement Point
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, mSliceTextureSrcID_N1, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	////////////////////////////////////////////////////////////////////////// -2
-	// Framebuffer Object 
-	glGenFramebuffersEXT(1, &mFBO_ID_N2);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID_N2);
-
-	// Attach Texture to FBO Color Attachement Point
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL_TEXTURE_2D, mSliceTextureSrcID_N2, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	////////////////////////////////////////////////////////////////////////// +1
-	// Framebuffer Object 
-	glGenFramebuffersEXT(1, &mFBO_ID_P1);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID_P1);
-
-	// Attach Texture to FBO Color Attachement Point
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT3_EXT, GL_TEXTURE_2D, mSliceTextureSrcID_P1, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	////////////////////////////////////////////////////////////////////////// +2
-	// Framebuffer Object 
-	glGenFramebuffersEXT(1, &mFBO_ID_P2);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID_P2);
-
-	// Attach Texture to FBO Color Attachement Point
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT4_EXT, GL_TEXTURE_2D, mSliceTextureSrcID_P2, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-
-
-	
-
 	printf("	Frame Buffer Preparation Done Successfully \n\n"); 
 }
 
@@ -133,22 +93,12 @@ void PrepareArrays()
 	
 	// Creating FB Array to Recieve Data From FB Texture 
 	mFrameBufferArray	= (float*) malloc (mSliceWidth * mSliceHeight * 2 * sizeof(float));
-	mFrameBufferArray_N2	= (float*) malloc (mSliceWidth * mSliceHeight * 2 * sizeof(float)); 
-	mFrameBufferArray_N1	= (float*) malloc (mSliceWidth * mSliceHeight * 2 * sizeof(float)); 
-	mFrameBufferArray_P1	= (float*) malloc (mSliceWidth * mSliceHeight * 2 * sizeof(float)); 
-	mFrameBufferArray_P2	= (float*) malloc (mSliceWidth * mSliceHeight * 2 * sizeof(float)); 
-
-
 
 
 
 	for (int i = 0; i < mSliceWidth * mSliceHeight * 2; i++)
 	{
-		mFrameBufferArray[i] = 0;
-		mFrameBufferArray_N2[i]	= 0; 
-		mFrameBufferArray_N1[i]	= 0; 
-		mFrameBufferArray_P1[i]	= 0; 
-		mFrameBufferArray_P2[i] = 0; 	
+		mFrameBufferArray[i] = 0;	
 	}
 	
 	// Extracted Slice in the Frequency Domain 

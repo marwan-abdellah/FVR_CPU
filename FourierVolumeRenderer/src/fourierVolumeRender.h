@@ -51,8 +51,6 @@
 #include <vector_functions.h>
 #include <driver_functions.h>
 
-// #include "getTimeOfDay.h"
-
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>
