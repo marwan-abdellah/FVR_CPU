@@ -191,7 +191,7 @@ GLuint mFBO_ID_P1;
 GLuint mFBO_ID_N1;  
 GLuint mFBO_ID_N2;  
 
-GLuint mDiaplayList;
+
 
 
 // Data Arrays _____________________________________________________________*/ 

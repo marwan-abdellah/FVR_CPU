@@ -3,7 +3,6 @@
 #include "loadData.h"
 #include "contextOpenGL.h"
 #include "contextCUDA.h"
-#include "displayList.h"
 #include "genericVariables.h"
 #include "wrapAround.h"
 #include "fourierSpectrum.h"
@@ -97,7 +96,7 @@ int main(int argc, char** argv)
 	SendSpectrumTextureToGPU(); 
 	
 	// We Don't Need Float Data Ayn More As It Resides in the GPU Texture Memory	
-	delete [] mVolumeDataFloat; 
+    free(mVolumeDataFloat);
 	
 	// OpenGL Initialization 
 	initOpenGL(); 

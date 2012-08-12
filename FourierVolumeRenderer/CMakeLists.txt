@@ -93,8 +93,8 @@ LIST(APPEND SOURCES src/Loader/loader.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Loader)
 
 # OpenGL
-#LIST(APPEND SOURCES src/OpenGL/OpenGL.cpp)
-#INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OpenGL)
+LIST(APPEND SOURCES src/OpenGL/DisplayList.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OpenGL)
 
 # Volume Processing
 LIST(APPEND SOURCES src/VolumeProcessing/volume.cpp)
@@ -107,6 +107,10 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/FFTShift/)
 # Spectrum
 LIST(APPEND SOURCES src/SpectrumProcessing/Spectrum.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SpectrumProcessing/)
+
+# Spectrum
+LIST(APPEND SOURCES src/SliceProcessing/Slice.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SliceProcessing/)
 
 
 # Include directories 

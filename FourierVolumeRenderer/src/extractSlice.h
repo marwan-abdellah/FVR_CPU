@@ -1,10 +1,13 @@
 #include "fourierVolumeRender.h"
 
+#include "OpenGL/DisplayList.h"
+
 void GetSlice(float sCenter, GLuint* bufferID, GLuint* textureID)
 {
 	printf("Extracting Fourier Slice ... \n"); 
 	
-	SetDisplayList(sCenter); 
+    GLuint displayList = OpenGL::setDisplayList(0, 1);
+    // SetDisplayList(sCenter);
 
 	// Render to Framebuffer Render Target 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
@@ -85,7 +88,7 @@ void GetSlice(float sCenter, GLuint* bufferID, GLuint* textureID)
 	glEnable(GL_CLIP_PLANE5);
 
 	// Render Enclosing Rectangle (Only at (0,0) Plane)
-	glCallList(mDiaplayList);
+    glCallList(displayList);
 	glPopMatrix();  
 
 	// Disable Texturing 
@@ -130,9 +133,7 @@ void GetSlice(float sCenter, GLuint* bufferID, GLuint* textureID)
 // Extract Slice from the 3D Spectrum 
 void GetSpectrumSlice()
 {
-	float fraction = 0.00390625; 
-	//////////////////////////////////////////////////////////////////////// Slice 0
-	GetSlice(trans/256, &mFBO_ID, &mSliceTextureSrcID); 
+    GetSlice(0, &mFBO_ID, &mSliceTextureSrcID);
 
 	// Attach FBO 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
@@ -143,312 +144,19 @@ void GetSpectrumSlice()
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 
-	/*
-	//////////////////////////////////////////////////////////////////////// Slice -1
-	GetSlice(-fraction, &mFBO_ID, &mSliceTextureSrcID); 
+    printf("CPU Processing \n");
 
-	// Attach FBO 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
-	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT); 
-	
-	// Writing FBO Texture Components into mFrameBufferArray 
-	glReadPixels(0,0, mSliceWidth, mSliceHeight, RG, GL_FLOAT, mFrameBufferArray_N1);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    int ctr = 0;
+    for (int i = 0; i < (256 * 256 * 2); i += 2)
+    {
+        mSliceArrayComplex[ctr][0] = mFrameBufferArray[i];
+        mSliceArrayComplex[ctr][1] = mFrameBufferArray[i+1];
+        ctr++;
+    }
 
-	//////////////////////////////////////////////////////////////////////// Slice -2
-	GetSlice((-2 * fraction), &mFBO_ID, &mSliceTextureSrcID); 
+    // Filter CPU
+    // ProcessSlice();
 
-	// Attach FBO 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
-	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT); 
-	
-	// Writing FBO Texture Components into mFrameBufferArray 
-	glReadPixels(0,0, mSliceWidth, mSliceHeight, RG, GL_FLOAT, mFrameBufferArray_N2);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	//////////////////////////////////////////////////////////////////////// Slice +1
-	GetSlice(fraction, &mFBO_ID, &mSliceTextureSrcID); 
-
-	// Attach FBO 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
-	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT); 
-	
-	// Writing FBO Texture Components into mFrameBufferArray 
-	glReadPixels(0,0, mSliceWidth, mSliceHeight, RG, GL_FLOAT, mFrameBufferArray_P1);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	//////////////////////////////////////////////////////////////////////// Slice +2
-	GetSlice(2 * fraction, &mFBO_ID, &mSliceTextureSrcID); 
-
-	// Attach FBO 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
-	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT); 
-	
-	// Writing FBO Texture Components into mFrameBufferArray 
-	glReadPixels(0,0, mSliceWidth, mSliceHeight, RG, GL_FLOAT, mFrameBufferArray_P2);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	*/
-
-	/*
-	// Check the Extracted Slices 
-	for (int i = 0; i < 256; i++)
-	{
-		printf("%f | %f | %f | %f | %f \n", mFrameBufferArray_N2[i], mFrameBufferArray_N1[i], mFrameBufferArray[i], mFrameBufferArray_P1[i], mFrameBufferArray_P2[i]); 
-	}
-	*/
-	 
-	/*
-	// Pack Slices in 3D array
-	int mCtr = 0; 
-	for (int i = 0; i < 256; i++)
-		for(int j = 0; j < 256; j++)
-		{
-			mPlane3D[i][j][1].x = mFrameBufferArray_N2[mCtr];
-			mPlane3D[i][j][1].y = mFrameBufferArray_N2[mCtr+1];
-			mPlane3D[i][j][2].x = mFrameBufferArray_N1[mCtr];
-			mPlane3D[i][j][2].y = mFrameBufferArray_N1[mCtr+1];
-			mPlane3D[i][j][3].x = mFrameBufferArray[mCtr];
-			mPlane3D[i][j][3].y = mFrameBufferArray[mCtr+1];
-			mPlane3D[i][j][4].x = mFrameBufferArray_P1[mCtr];
-			mPlane3D[i][j][4].y = mFrameBufferArray_P1[mCtr+1];
-			mPlane3D[i][j][5].x = mFrameBufferArray_P2[mCtr];
-			mPlane3D[i][j][5].y = mFrameBufferArray_P2[mCtr+1];
-
-			mCtr += 2; 		
-	}
-	*/ 
-
-	/*
-	// Do Slice Resampling Along a Plane  	
-	int ctr = 0; 
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{
-			for (int k = 0; k < 5; k++)
-			{		
-				mPlane3D_Out[i][j][2].x += mPlane3D[i][j][k].x; 
-				mPlane3D_Out[i][j][2].y += mPlane3D[i][j][k].y; 
-			}
-		}
-	}
-
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{
-			mPlane3D[i][j][2].x = mPlane3D_Out[i][j][2].x /= 5; 
-			mPlane3D[i][j][2].y = mPlane3D_Out[i][j][2].y /= 5; 
-		}
-	}
-	*/ 
-
-
-	/*
-	// Do it for the Plane (2D Lattice)
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{
-			mPlane3D_Out[i][j][2].x = 0; 
-			mPlane3D_Out[i][j][2].y = 0; 
-		}
-	}
-	
-
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{								
-				
-			mPlane3D_Out[i][j][2].x += mPlane3D[i][j][2].x;
-			mPlane3D_Out[i][j][2].y += mPlane3D[i][j][2].y;
-
-			if (!(i-2 < 0))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i-2][j][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i-2][j][2].y;
-			}
-			
-			if (!(i-1 < 0))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i-1][j][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i-1][j][2].y;
-			}
-			
-			if (!(i+1 > 255))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i+1][j][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i+1][j][2].y;
-			}
-			
-			if (!(i+2 > 255))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i+2][j][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i+2][j][2].y;
-			}
-
-			/////////////////////////////////////////////////////////
-
-			if (!(j-2 < 0))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i][j-2][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i][j-2][2].y;
-			}
-			
-			if (!(j-1 < 0))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i][j-1][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i][j-1][2].y;
-			}
-			
-			if (!(j+1 > 255))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i][j+1][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i][j+1][2].y;
-			}
-			
-			if (!(j+2 > 255))
-			{
-				mPlane3D_Out[i][j][2].x += mPlane3D[i][j+2][2].x;
-				mPlane3D_Out[i][j][2].y += mPlane3D[i][j+2][2].y;
-			}
-
-			if ((i-1 < 0) || (i-2 < 0) || (j-1 < 0) || (j-2 < 0) || (i+1 > 255) || (i+2>255) || (j+1>255) || (j+2>255))
-			{
-				mPlane3D_Out[i][j][2].x = mPlane3D[i][j][2].x;
-				mPlane3D_Out[i][j][2].y = mPlane3D[i][j][2].y;
-			}
-
-			else
-			{
-				mPlane3D_Out[i][j][2].x = (mPlane3D[i][j][2].x +  mPlane3D[i-2][j][2].x + mPlane3D[i-1][j][2].x + mPlane3D[i+1][j][2].x + mPlane3D[i+2][j][2].x);
-				mPlane3D_Out[i][j][2].y = (mPlane3D[i][j][2].y + mPlane3D[i-2][j][2].y + mPlane3D[i-1][j][2].y + mPlane3D[i+1][j][2].y + mPlane3D[i+2][j][2].y); 
-				
-				mPlane3D_Out[i][j][2].x = (mPlane3D[i][j][2].x + mPlane3D[i][j-2][2].x + mPlane3D[i][j-1][2].x + mPlane3D[i][j+1][2].x + mPlane3D[i][j+2][2].x);
-				mPlane3D_Out[i][j][2].y = (mPlane3D[i][j][2].y + mPlane3D[i][j-2][2].y + mPlane3D[i][j-1][2].y + mPlane3D[i][j+1][2].y + mPlane3D[i][j+2][2].y);
-			}
-		}
-	}
-
-
-	
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{	
-			if (!(i-2 < 0))
-			{
-				mPlane3D_Out[i][j][2].x /= 3;
-				mPlane3D_Out[i][j][2].y /= 3;
-			}
-			
-			else if (!(i-1 < 0))
-			{
-				mPlane3D_Out[i][j][2].x /= 4;
-				mPlane3D_Out[i][j][2].y /= 4;
-			}
-			
-			else if (!(i+1 > 255))
-			{
-				mPlane3D_Out[i][j][2].x /= 4;
-				mPlane3D_Out[i][j][2].y /= 4;
-			}
-			
-			else if (!(i+2 > 255))
-			{
-				mPlane3D_Out[i][j][2].x /= 3;
-				mPlane3D_Out[i][j][2].y /= 3;
-			}
-
-			else 
-			{
-				mPlane3D_Out[i][j][2].x /= 5;
-				mPlane3D_Out[i][j][2].y /= 5;
-			}
-		}
-	}
-
-		
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{	
-			if (!(j-2 < 0))
-			{
-				mPlane3D_Out[i][j][2].x /= 3;
-				mPlane3D_Out[i][j][2].y /= 3;
-			}
-			
-			else if (!(j-1 < 0))
-			{
-				mPlane3D_Out[i][j][2].x /= 4;
-				mPlane3D_Out[i][j][2].y /= 4;
-			}
-			
-			else if (!(j+1 > 255))
-			{
-				mPlane3D_Out[i][j][2].x /= 4;
-				mPlane3D_Out[i][j][2].y /= 4;
-			}
-			
-			else if (!(j+2 > 255))
-			{
-				mPlane3D_Out[i][j][2].x /= 3;
-				mPlane3D_Out[i][j][2].y /= 3;
-			}
-
-			else 
-			{
-				mPlane3D_Out[i][j][2].x /= 5;
-				mPlane3D_Out[i][j][2].y /= 5;
-			}
-		}
-	}	
-*/
-
-	/*
-	// Working ony with the Central 2D Lattice 
-	ctr = 0; 
-	for (int i = 0; i < 256; i++)
-			for (int j = 0; j < 256; j++)
-			{
-				mFrameBufferArray[ctr++] = mPlane3D[i][j][2].x;
-				mFrameBufferArray[ctr++] = mPlane3D[i][j][2].y;
-			}
-	*/
-	
-
-	int ctr = 0;
-	if (CUDA_ENABLED)
-	{
-		// CUDA Slice Processing 
-		ProcessSliceCUDA(mSliceWidth,mSliceHeight); 
-	
-		printf("CUDA Processing \n"); 
-				 
-		for (int i = 0; i < (mSliceWidth * mSliceHeight); i++)
-		{
-			mSliceArrayComplex[ctr][0] = fReconstructedImage[i].x;
-			mSliceArrayComplex[ctr][1] = fReconstructedImage[i].y;
-			ctr++; 
-		}
-	}
-	else 
-	{
-		printf("CPU Processing \n"); 
-
-		
-		for (int i = 0; i < (256 * 256 * 2); i += 2)
-		{
-			mSliceArrayComplex[ctr][0] = mFrameBufferArray[i];
-			mSliceArrayComplex[ctr][1] = mFrameBufferArray[i+1];
-			ctr++; 
-		} 
-		
-		// Filter CPU
-		ProcessSlice(); 	
-	}
 
 	// 2D FFT
 	// printf("Executing 2D Inverse FFT - Begin.... \n");
@@ -482,8 +190,6 @@ void GetSpectrumSlice()
 	{
 		mRecImage[i] = (uchar)(mAbsoluteReconstructedImage[i]);
 	}
-
-	// glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); 
 
 	// Create 2D Texture Object as a Render Target 
 	glGenTextures(1, &mSliceTextureID);
