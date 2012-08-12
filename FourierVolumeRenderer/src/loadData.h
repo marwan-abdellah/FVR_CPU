@@ -1,5 +1,16 @@
 #include "fourierVolumeRender.h"
-#include "Shared.h"
+#include "shared.h"
+#include "Loader/loader.h"
+
+void initVolumeData()
+{
+    printf("Loading dataSet ... \n");
+
+    volume* iVolume = Loader::loadVolume(mPath);
+    mVolumeData =  iVolume->ptrVol_char;
+
+    printf("\t Done loading DataSet successfully \n");
+}
 
 
 volume* loadVolume(char* volFile, char* hdrFile)

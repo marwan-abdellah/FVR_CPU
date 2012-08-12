@@ -73,7 +73,9 @@ int main(int argc, char** argv)
 	initCUDA();
 	
 	// Reading & Initializing Data 	
-	InitData(); 
+    // InitData();
+
+    initVolumeData();
 
 	// Creating Float Data & Releasing Byte Data 	
 	CreateFloatData(); 

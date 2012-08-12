@@ -88,6 +88,19 @@ src/processSlice.h
 src/resamplingFilter.h
 src/wrapAround.h)
 
+# Loader
+LIST(APPEND SOURCES src/Loader/loader.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Loader)
+
+# OpenGL
+#LIST(APPEND SOURCES src/OpenGL/OpenGL.cpp)
+#INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OpenGL)
+
+# Volume Processing
+LIST(APPEND SOURCES src/VolumeProcessing/volume.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/VolumeProcessing/)
+
+
 
 # Include directories 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})

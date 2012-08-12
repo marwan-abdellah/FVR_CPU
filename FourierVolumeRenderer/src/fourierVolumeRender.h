@@ -125,7 +125,7 @@ int mWindowHeight		= 512;
 // Volume Attributes _______________________________________________________*/
 // Volume File Path
 // char* mPath =  "../../Data/CTHead1/CTData.img"; 
-char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData.img"; 
+char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData";
 
 // Volume Dimensions  
 int mVolWidth			= 0; 
