@@ -18,6 +18,49 @@
 #include "SliceProcessing/Slice.h"
 #include "FFTShift/FFTShift.h"
 
+typedef unsigned char 	uchar;
+
+int mVolWidth			= 0;
+int mVolHeight			= 0;
+int mVolDepth			= 0;
+int mUniDim 			= 0;
+int mVolumeSize			= 0;
+int mVolumeSizeBytes	= 0;
+int mSliceWidth 		= 0;
+int mSliceHeight 		= 0;
+int mSliceSize			= 0;
+
+// Wrapping Around Globals _________________________________________________*/
+float** 	mImg_2D;
+float** 	mImg_2D_Temp;
+float***	mVol_3D;
+
+// Framebuffer Object Globals
+GLuint mFBO_ID;
+
+char* 		mVolumeData;
+uchar*		mRecImage;
+float* 		mVolumeDataFloat;
+float*	 	mAbsoluteReconstructedImage;
+
+// OpenGL Texture Arrays
+float* 		mTextureArray;
+float* 		mFrameBufferArray;
+
+// OpenGL Texture IDs
+GLuint 		mVolTexureID;		// 3D Spectrum Texture ID
+
+GLuint 		mSliceTextureSrcID; 	// Input Texture to CUDA ID
+
+
+
+// FFTW Globals ____________________________________________________________*/
+fftwf_complex* 	mVolumeArrayComplex;
+fftwf_complex* 	mSliceArrayComplex;
+
+void WrapAroundVolume();
+void WrapAroundSpectrum();
+
 
 // 3D Wrapping Around for Space Data
 void WrapAroundVolume()
@@ -245,9 +288,9 @@ int main(int argc, char** argv)
         mVolHeight			= 256;
         mVolDepth			= 256;
         mUniDim 			= 256;
-        mVolArea 			= mVolWidth * mVolHeight;
+
         mVolumeSize 		= mVolWidth * mVolHeight * mVolDepth;
-        mVolumeSizeBytes	= mVolumeSize * sizeof(mVolumeType);
+        mVolumeSizeBytes	= mVolumeSize * sizeof(char);
 
 
         // Slice Attributes

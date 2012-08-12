@@ -113,138 +113,30 @@ const char *appName = "fourierVolumeRender";
 
 
 
+char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData";
 
+// OpenGL Globals  _________________________________________________________*/
+// Rotation Parameters
+int mXrot			= -0;
+int mYrot			= -0;
+int mZrot			= 0;
+int mScalingFactor 	= 25;
+float trans = 0;
 
-
-
-
-
-
-
-
-
-
-
-     typedef unsigned int 	uint;
-     typedef unsigned char 	uchar;
-     typedef unsigned char 	mVolumeType;
-
-
-
-
-
-     float sVal = 1.0;
-
-     // Globals ________________________________________________________________________________________*/
-     // GLUT Globals ____________________________________________________________*/
-     int mWindowWidth		= 512;
-     int mWindowHeight		= 512;
-
-
-     // Volume Attributes _______________________________________________________*/
-     // Volume File Path
-     // char* mPath =  "../../Data/CTHead1/CTData.img";
-     char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData";
-
-     // Volume Dimensions
-     int mVolWidth			= 0;
-     int mVolHeight			= 0;
-     int mVolDepth			= 0;
-     int mUniDim 			= 0;
-     int mVolArea 			= 0;
-
-
-     // Volume Size
-     int mVolumeSize			= 0;
-     int mVolumeSizeBytes	= 0;
-
-
-     // Slice Attributes ________________________________________________________*/
-     int mSliceWidth 		= 0;
-     int mSliceHeight 		= 0;
-     int mSliceSize			= 0;
-
-
-
-     // FFTW Globals ____________________________________________________________*/
-     fftwf_complex* 	mVolumeArrayComplex;
-     fftwf_complex* 	mSliceArrayComplex;
-
-
-     // Wrapping Around Globals _________________________________________________*/
-     float** 	mImg_2D;
-     float** 	mImg_2D_Temp;
-     float***	mVol_3D;
-
-     float2*** mPlane3D;
-     float2*** mPlane3D_Out;
-
-
-
-     // Dummy CUDA Context Globals ______________________________________________*/
-     int 		mArraySize	= 64;
-     float*		mDeviceArray;
-     float*		mHostArray;
-
-
-
-     // OpenGL Globals  _________________________________________________________*/
-     // Rotation Parameters
-     int mXrot			= -0;
-     int mYrot			= -0;
-     int mZrot			= 0;
-     int mScalingFactor 	= 25;
-
-     // Framebuffer Object Globals
-     GLuint mFBO_ID;
-
-
-
-     // Data Arrays _____________________________________________________________*/
-     // Default Arrays
-     char* 		mVolumeData;
-     uchar*		mRecImage;
-     float* 		mVolumeDataFloat;
-     float*	 	mAbsoluteReconstructedImage;
-
-     // OpenGL Texture Arrays
-     float* 		mTextureArray;
-     float* 		mFrameBufferArray;
-
-     // OpenGL Texture IDs
-     GLuint 		mVolTexureID;		// 3D Spectrum Texture ID
-     GLuint		mSliceTextureID; 	// Extracted Slice ID
-     GLuint 		mSliceTextureSrcID; 	// Input Texture to CUDA ID
-
-
-
-
-     float trans = 0;
-
-
-     float2* fReconstructedImage;
-     float2* fReconstructedImageDevice;
-
-     char*** volIn3D;
-     char*** volOut3D;
 
 // Forward Declarations __________________________________________________________________________*/ 
 // OpenGL Initialization Function __________________________________________*/
 void InitOpenGLContext(int argc, char** argv); 
 void initOpenGL(); 
-void initGlut(int argc, char** argv);
-
-
-// OpenGL Versioning Functions _____________________________________________*/
-CUTBoolean CheckOpenGLExtensions();
 
 
 
 
 
-void WrapAroundVolume(); 
-void WrapAroundSpectrum(); 	
+
+GLuint		mSliceTextureID; 	// Extracted Slice ID
 void GetSpectrumSlice();
+
 
 
 

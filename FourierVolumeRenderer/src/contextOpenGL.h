@@ -5,6 +5,15 @@ int sWindowHeight;
 
 float mImageScale = 2; 
 
+   float sVal = 1.0;
+
+   int mWindowWidth		= 512;
+   int mWindowHeight		= 512;
+
+   // OpenGL Versioning Functions _____________________________________________*/
+   CUTBoolean CheckOpenGLExtensions();
+   void initGlut(int argc, char** argv);
+
 
 // OpenGL Contetx Function _________________________________________________*/
 void DisplayGL();
