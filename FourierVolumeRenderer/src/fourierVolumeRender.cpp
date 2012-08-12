@@ -77,6 +77,8 @@ int main(int argc, char** argv)
 
     initVolumeData();
 
+    extractVolume();
+
 	// Creating Float Data & Releasing Byte Data 	
 	CreateFloatData(); 
 
