@@ -2,21 +2,27 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <cutil_inline.h>
-#include <cuda_runtime_api.h>
-#include <cutil_gl_inline.h>
-#include <cutil_gl_error.h>
-#include <cuda_gl_interop.h>
-#include <cudaGL.h>
+#include "shared.h"
 
-#include <vector_types.h>
-#include <vector_functions.h>
-#include <driver_functions.h>
+extern void GetSpectrumSlice();
 
 
-#include "globals.h"
+
+void OpenGL::PrepareFBO(GLuint* FBO_ID, GLuint* sliceTexture)
+{
+    printf("Preparing FrameBuffer Object & Its Associated Texture \n");
+
+    ////////////////////////////////////////////////////////////////////////// 0
+    // Framebuffer Object
+    glGenFramebuffersEXT(1, FBO_ID);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, *FBO_ID);
+
+    // Attach Texture to FBO Color Attachement Point
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, *sliceTexture, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+    printf("	Frame Buffer Preparation Done Successfully \n\n");
+}
 
 void OpenGL::InitOpenGLContext(int argc, char** argv)
 {
@@ -24,34 +30,46 @@ void OpenGL::InitOpenGLContext(int argc, char** argv)
     printf ("	First Initialize OpenGL Context, So We Can Properly Set the GL for CUDA. \n");
     printf ("	This is Necessary in order to Achieve Optimal Performance with OpenGL/CUDA Interop. \n");
 
-    /*
-    if (IsOpenGLAvailable(appName))
-        fprintf(stderr, "	OpenGL Device is Available \n\n");
-    else
-    {
-        fprintf(stderr, "	OpenGL device is NOT Available, [%s] exiting...\n  PASSED\n\n", appName );
-        exit(0);
-    }
-    */
 
     // GLUT Initialization
     initGlut(argc, argv);
 
-    /*
-    // Initialize Necessary OpenGL Extensions
-    if (CUTFalse == CheckOpenGLExtensions())
-    {
-        printf("	Missing OpenGL Necessary Extensions  \n Exiting ..... \n");
-        exit(0);
-    }
-    else
-        printf("	Requied OpenGL Extensions are Found \n\n");
+
 
     // Register OpenGL CallBack Functions
-    RegisterOpenGLCallBacks();
-    */
+    OpenGLRegisterOpenGLCallBacks();
+
 }
 
+
+GLuint* imageTexure_ID;
+
+namespace OpenGL
+{
+    int dispWinWidth = 512;
+    int dispWinHeight = 512;
+    int rot_X = 0;
+    int rot_Y = 0;
+    int rot_Z = 0;
+    int scaleFactor = 1;
+
+    float mXrot = 0;
+    float mYrot = 0;
+    float mZrot = 0;
+    int mScalingFactor = 1;
+    int sVal;
+
+    int sWindowWidth;
+    int sWindowHeight;
+
+    float mImageScale;
+}
+
+
+void OpenGL::updateImageTexture(GLuint* newImageTexture_ID)
+{
+    imageTexure_ID = newImageTexture_ID;
+}
 
 void OpenGL::initGlut(int argc, char** argv)
 {
@@ -60,11 +78,11 @@ void OpenGL::initGlut(int argc, char** argv)
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-    glutInitWindowSize(Global::mWindowWidth, Global::mWindowHeight);
+    glutInitWindowSize(dispWinWidth, dispWinHeight);
     glutCreateWindow("Fourier Volume Rendering on CUDA");
 
     printf("	Display Mode		: GLUT_RGBA | GLUT_DOUBLE \n");
-    printf("	GLUT Windows Size	: %d mLoop %d \n \n", Global::mWindowWidth, Global::mWindowHeight);
+    printf("	GLUT Windows Size	: %d %d \n \n", dispWinWidth, dispWinHeight);
 }
 
 void OpenGL::initOpenGL()
@@ -80,7 +98,7 @@ void OpenGL::initOpenGL()
     printf("	Initializing OpenGL Done \n\n");
 }
 
-void DisplayGL()
+void OpenGL::DisplayGL()
 {
     // Clearing color buffer
     glClear(GL_COLOR_BUFFER_BIT);
@@ -89,7 +107,7 @@ void DisplayGL()
     glDisable(GL_DEPTH_TEST);
 
     // Binding slice texture to be displayed on OpenGL polygon
-    glBindTexture(GL_TEXTURE_2D, Global::mSliceTextureID);
+    glBindTexture(GL_TEXTURE_2D, *imageTexure_ID);
     glEnable(GL_TEXTURE_2D);
 
     // Slice texture parameters
@@ -99,13 +117,13 @@ void DisplayGL()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // Adjusting Viewport
-    glViewport(-Global::sWindowWidth / 2, -Global::sWindowHeight / 2, Global::sWindowWidth * 2, Global::sWindowHeight * 2);
+    glViewport(-sWindowWidth / 2, -sWindowHeight / 2, sWindowWidth * 2, sWindowHeight * 2);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
     // Center Slice Texture (0,0)
-    glScalef(Global::mImageScale, Global::mImageScale, 1);
+    glScalef(mImageScale, mImageScale, 1);
     glTranslatef(-0.5, -0.5, 0.0);
 
     glBegin(GL_QUADS);
@@ -131,8 +149,8 @@ void OpenGL::Reshape(int windowWidth, int windowHight)
     glViewport(0, 0, windowWidth, windowHight);
 
     // Update global window parameters to reflect texture updates
-    Global::sWindowHeight = windowHight;
-    Global::sWindowWidth = windowWidth;
+    sWindowHeight = windowHight;
+    sWindowWidth = windowWidth;
 
     // Adjust the projection matrix
     glMatrixMode(GL_PROJECTION);
@@ -157,28 +175,28 @@ void OpenGL::KeyBoard(unsigned char fKey, int fX, int fY)
             exit (0);
             break;
         case 'Q':
-            Global::mXrot += 5.0;
-            printf("Rotating %f around mLoop ... \n", (float) Global::mXrot);
+            mXrot += 5.0;
+            printf("Rotating %f around mLoop ... \n", (float) mXrot);
             break;
         case 'q':
-            Global::mXrot -= 5.0;
-            printf("Rotating %f around mLoop ... \n", (float) Global::mXrot);
+            mXrot -= 5.0;
+            printf("Rotating %f around mLoop ... \n", (float) mXrot);
             break;
         case 'W':
-            Global::mYrot += 5.0;
-            printf("Rotating %f around Y ... \n", (float) Global::mYrot);
+            mYrot += 5.0;
+            printf("Rotating %f around Y ... \n", (float) mYrot);
             break;
         case 'w':
-            Global::mYrot -= 5.0;
-            printf("Rotating %f around Y ... \n", (float) Global::mYrot);
+            mYrot -= 5.0;
+            printf("Rotating %f around Y ... \n", (float) mYrot);
             break;
         case 'E':
-           Global::mZrot += 5.0;
-            printf("Rotating %f around Z ... \n", (float) Global::mZrot);
+           mZrot += 5.0;
+            printf("Rotating %f around Z ... \n", (float) mZrot);
             break;
         case 'e':
-            Global::mZrot -= 5.0;
-            printf("Rotating %f around Z ... \n", (float) Global::mZrot);
+            mZrot -= 5.0;
+            printf("Rotating %f around Z ... \n", (float) mZrot);
             break;
         case ' ':
            // CUDA_ENABLED = (!CUDA_ENABLED);
@@ -186,57 +204,56 @@ void OpenGL::KeyBoard(unsigned char fKey, int fX, int fY)
             break;
 
         case 'R':
-            Global::sVal = Global::sVal * 10;
-            printf("sVal %f \n", Global::sVal);
+            sVal = sVal * 10;
+            printf("sVal %f \n", sVal);
             break;
 
         case 'r':
-            Global::sVal = Global::sVal / 10;
-            printf("sVal %f \n", Global::sVal);
+            sVal = sVal / 10;
+            printf("sVal %f \n", sVal);
             break;
 
         case 'o':
-            Global::trans = Global::trans + 1;
-            printf("trans : %f/256 \n", Global::trans);
+            //trans = trans + 1;
+            //printf("trans : %f/256 \n", trans);
             break;
 
         case 'p':
-            Global::trans = Global::trans - 1;
-            printf("trans : %f/256 \n", Global::trans);
+            //trans = trans - 1;
+            //printf("trans : %f/256 \n", trans);
             break;
 
         case 's':
-            Global::mScalingFactor *= 5;
-            printf("mScalingFactor : %f \n", Global::mScalingFactor);
+            mScalingFactor *= 5;
+            printf("mScalingFactor : %f \n", mScalingFactor);
             break;
 
         case 'S':
-            Global::mScalingFactor /= 5;
-            printf("mScalingFactor : %f \n", Global::mScalingFactor);
+            mScalingFactor /= 5;
+            printf("mScalingFactor : %f \n", mScalingFactor);
             break;
 
         case 'a':
-            Global::mScalingFactor += 10;
-            printf("mScalingFactor : %f \n", Global::mScalingFactor);
+            mScalingFactor += 10;
+            printf("mScalingFactor : %f \n", mScalingFactor);
             break;
 
         case 'A':
-            Global::mScalingFactor -= 10;
-            printf("mScalingFactor : %f \n", Global::mScalingFactor);
+            mScalingFactor -= 10;
+            printf("mScalingFactor : %f \n", mScalingFactor);
             break;
 
-        case 'z' :Global::mImageScale += 0.5;
+        case 'z' :mImageScale += 0.5;
         break;
 
-        case 'Z' :Global::mImageScale -= 0.5;
+        case 'Z' :mImageScale -= 0.5;
         break;
 
         default:
             break;
     }
 
-    // Re-Slice & Re-Display
-   // GetSpectrumSlice();
+    GetSpectrumSlice();
     glutPostRedisplay();
 }
 
@@ -258,3 +275,17 @@ void OpenGL::MouseMotion(int fX, int fY)
     if (fX | fY) {}
 }
 
+void OpenGL::OpenGLRegisterOpenGLCallBacks()
+{
+    // Registering OpenGL Context
+    printf("Registerng OpenGL Context CallBacks ... \n");
+
+    glutDisplayFunc(OpenGL::DisplayGL);
+    glutKeyboardFunc(OpenGL::KeyBoard);
+    glutReshapeFunc(OpenGL::Reshape);
+    glutIdleFunc(OpenGL::Idle);
+    glutMouseFunc(OpenGL::Mouse);
+    glutMotionFunc(OpenGL::MouseMotion);
+
+    printf("	CallBacks Registered Successfully \n\n");
+}

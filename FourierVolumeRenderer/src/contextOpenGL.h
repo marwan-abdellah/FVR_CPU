@@ -5,6 +5,16 @@ int sWindowHeight;
 
 float mImageScale = 2; 
 
+
+// OpenGL Contetx Function _________________________________________________*/
+void DisplayGL();
+void Reshape();
+void KeyBoard();
+void Idel();
+void Mouse(int fButton, int fState, int fX, int fY);
+void MouseMotion(int fX, int fY);
+void RegisterOpenGLCallBacks();
+
 void InitOpenGLContext(int argc, char** argv)
 {
 	printf ("Initializing OpenGL Contex ... \n"); 
@@ -85,7 +95,7 @@ void DisplayGL()
 	glDisable(GL_DEPTH_TEST);
 	
 	// Binding Slice Texture to be Displayed On OpenGL Quad 
-	glBindTexture(GL_TEXTURE_2D, mSliceTextureID);	
+    glBindTexture(GL_TEXTURE_2D, mSliceTextureID);
 	glEnable(GL_TEXTURE_2D);
 	
 	// Slice Texture Parameters 
@@ -174,8 +184,7 @@ void KeyBoard(unsigned char fKey, int fX, int fY)
 			printf("Rotating %f around Z ... \n", (float) mZrot);
 			break;
 		case ' ':
-			CUDA_ENABLED = (!CUDA_ENABLED);
-			printf("Enabling / Disabling CUDA Processing");
+
 			break; 
 		
 		case 'R':
@@ -252,3 +261,17 @@ void MouseMotion(int fX, int fY)
 }
 
 
+void RegisterOpenGLCallBacks()
+{
+    // Registering OpenGL Context
+    printf("Registerng OpenGL Context CallBacks ... \n");
+
+    glutDisplayFunc(DisplayGL);
+    glutKeyboardFunc(KeyBoard);
+    glutReshapeFunc(Reshape);
+    glutIdleFunc(Idle);
+    glutMouseFunc(Mouse);
+    glutMotionFunc(MouseMotion);
+
+    printf("	CallBacks Registered Successfully \n\n");
+}

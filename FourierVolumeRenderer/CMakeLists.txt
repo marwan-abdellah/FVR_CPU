@@ -73,19 +73,9 @@ INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR})
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 SET(SOURCES src/fourierVolumeRender.cpp
-src/contextCUDA.h
 src/contextOpenGL.h
-src/createTexturesBuffers.h
-src/displayList.h
-src/extractSlice.h
-src/fftShift.h
-src/fourierSpectrum.h
 src/fourierVolumeRender.cpp
 src/fourierVolumeRender.h
-src/genericVariables.h
-src/loadData.h
-src/processSlice.h
-src/resamplingFilter.h
 src/wrapAround.h)
 
 # Loader
@@ -94,6 +84,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Loader)
 
 # OpenGL
 LIST(APPEND SOURCES src/OpenGL/DisplayList.cpp)
+LIST(APPEND SOURCES src/OpenGL/OpenGL.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OpenGL)
 
 # Volume Processing
@@ -124,7 +115,7 @@ INCLUDE_DIRECTORIES(${CUDA_KERNELS_DIR})
 # NOTE: You have to append all the ".cu" files in this file 
 #       to have them compiled
 # -------------------------------------------------------- 
-SET(CUDA_SOURCES src/interfaceCUDA.cu )
+# SET(CUDA_SOURCES)
     
 # Generate the executable considering CUDA stuff :)
 CUDA_ADD_EXECUTABLE(FVR ${CUDA_SOURCES} ${SOURCES})
