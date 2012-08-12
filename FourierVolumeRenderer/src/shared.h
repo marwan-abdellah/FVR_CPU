@@ -11,7 +11,6 @@
 #include <vector>
 #include <math.h>
 
-
 struct subVolDim
 {
     int min_X;

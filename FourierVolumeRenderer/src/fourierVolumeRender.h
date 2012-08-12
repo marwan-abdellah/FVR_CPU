@@ -21,7 +21,7 @@
 	#include "fftw3.h"
 #endif
 
-// OpenGL Includes 
+// OpenGL Includes
 #include <GL/glew.h>
 #include <GL/glu.h>
 
@@ -77,7 +77,7 @@
 // Type Definitions _______________________________________________________________________________*/ 
 typedef unsigned int 	uint;
 typedef unsigned char 	uchar;
-typedef unsigned char 	mVolumeType;  
+typedef unsigned char 	mVolumeType;
 
 using namespace std; 
 
@@ -114,94 +114,94 @@ const char *appName = "fourierVolumeRender";
 
 
 
-float sVal = 1.0; 
+float sVal = 1.0;
 
-// Globals ________________________________________________________________________________________*/ 
+// Globals ________________________________________________________________________________________*/
 // GLUT Globals ____________________________________________________________*/
-int mWindowWidth		= 512; 
+int mWindowWidth		= 512;
 int mWindowHeight		= 512;
 
 
 // Volume Attributes _______________________________________________________*/
 // Volume File Path
-// char* mPath =  "../../Data/CTHead1/CTData.img"; 
+// char* mPath =  "../../Data/CTHead1/CTData.img";
 char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData";
 
-// Volume Dimensions  
-int mVolWidth			= 0; 
-int mVolHeight			= 0; 
+// Volume Dimensions
+int mVolWidth			= 0;
+int mVolHeight			= 0;
 int mVolDepth			= 0;
-int mUniDim 			= 0; 
-int mVolArea 			= 0; 
+int mUniDim 			= 0;
+int mVolArea 			= 0;
 
-// Original Volume Dimensions 
+// Original Volume Dimensions
 int xWidth		= 256;
 int xHeight		= 256;
-int xDepth		= 256;  
+int xDepth		= 256;
 
-// Volume Size 
-int mVolumeSize			= 0; 
-int mVolumeSizeBytes	= 0; 
+// Volume Size
+int mVolumeSize			= 0;
+int mVolumeSizeBytes	= 0;
 
 
 // Slice Attributes ________________________________________________________*/
-int mSliceWidth 		= 0; 
-int mSliceHeight 		= 0; 
+int mSliceWidth 		= 0;
+int mSliceHeight 		= 0;
 int mSliceSize			= 0;
 
 
 
-// FFTW Globals ____________________________________________________________*/ 
+// FFTW Globals ____________________________________________________________*/
 fftwf_complex* 	mVolumeArrayComplex;
 fftwf_complex* 	mSliceArrayComplex;
-fftwf_plan 	mFFTWPlan;  
+fftwf_plan 	mFFTWPlan;
 
 
 // Wrapping Around Globals _________________________________________________*/
-float** 	mImg_2D; 
-float** 	mImg_2D_Temp; 
-float***	mVol_3D;  
+float** 	mImg_2D;
+float** 	mImg_2D_Temp;
+float***	mVol_3D;
 
-float2*** mPlane3D; 
-float2*** mPlane3D_Out; 
+float2*** mPlane3D;
+float2*** mPlane3D_Out;
 
 
 
-// Dummy CUDA Context Globals ______________________________________________*/ 
-int 		mArraySize	= 64; 
+// Dummy CUDA Context Globals ______________________________________________*/
+int 		mArraySize	= 64;
 float*		mDeviceArray;
-float*		mHostArray; 
+float*		mHostArray;
 
-int mNumTexels 			= 0; 
-int mNumValues 			= 0; 
+int mNumTexels 			= 0;
+int mNumValues 			= 0;
 int mTextureDataSize 	= 0;
 
 
-// OpenGL Globals  _________________________________________________________*/ 
-// Rotation Parameters 
+// OpenGL Globals  _________________________________________________________*/
+// Rotation Parameters
 int mXrot			= -0;
-int mYrot			= -0; 
-int mZrot			= 0; 
-int mScalingFactor 	= 25; 	
+int mYrot			= -0;
+int mZrot			= 0;
+int mScalingFactor 	= 25;
 
-// Framebuffer Object Globals 
-GLuint mFBO_ID;  
-GLuint mFBO_ID_P2;  
-GLuint mFBO_ID_P1;  
-GLuint mFBO_ID_N1;  
-GLuint mFBO_ID_N2;  
-
-
+// Framebuffer Object Globals
+GLuint mFBO_ID;
+GLuint mFBO_ID_P2;
+GLuint mFBO_ID_P1;
+GLuint mFBO_ID_N1;
+GLuint mFBO_ID_N2;
 
 
-// Data Arrays _____________________________________________________________*/ 
-// Default Arrays 
+
+
+// Data Arrays _____________________________________________________________*/
+// Default Arrays
 char* 		mVolumeData;
 uchar*		mRecImage;
 float* 		mVolumeDataFloat;
-float*	 	mAbsoluteReconstructedImage; 
+float*	 	mAbsoluteReconstructedImage;
 
-// OpenGL Texture Arrays 
+// OpenGL Texture Arrays
 float* 		mTextureArray;
 float* 		mFrameBufferArray;
 
@@ -213,19 +213,19 @@ float* 		mFrameBufferArray_P2;
 // OpenGL Texture IDs
 GLuint 		mVolTexureID;		// 3D Spectrum Texture ID
 GLuint		mSliceTextureID; 	// Extracted Slice ID
-GLuint 		mSliceTextureSrcID; 	// Input Texture to CUDA ID 
-GLuint 		mProcessTextureID; 	// Input Processing Texture to CUDA ID 
+GLuint 		mSliceTextureSrcID; 	// Input Texture to CUDA ID
+GLuint 		mProcessTextureID; 	// Input Processing Texture to CUDA ID
 GLuint 		mSliceTextureResID;	// Destination of CUDA Results ID
 
 
 
-float trans = 0; 
+float trans = 0;
 
 
-GLuint 		mSliceTextureSrcID_N1; 	// Input Texture to CUDA ID 
-GLuint 		mSliceTextureSrcID_N2; 	// Input Texture to CUDA ID 
-GLuint 		mSliceTextureSrcID_P1; 	// Input Texture to CUDA ID 
-GLuint 		mSliceTextureSrcID_P2; 	// Input Texture to CUDA ID 
+GLuint 		mSliceTextureSrcID_N1; 	// Input Texture to CUDA ID
+GLuint 		mSliceTextureSrcID_N2; 	// Input Texture to CUDA ID
+GLuint 		mSliceTextureSrcID_P1; 	// Input Texture to CUDA ID
+GLuint 		mSliceTextureSrcID_P2; 	// Input Texture to CUDA ID
 
 
 struct cudaGraphicsResource *mCUDA_InputTexSliceResource;	// Input Slice Texture to CUDA
@@ -258,7 +258,7 @@ void Reshape();
 void KeyBoard(); 
 void Idel(); 
 void Mouse(int fButton, int fState, int fX, int fY); 
-void MouseMotion(int fX, int fY); 
+void MouseMotion(int fX, int fY);
 void RegisterOpenGLCallBacks();  
 
 

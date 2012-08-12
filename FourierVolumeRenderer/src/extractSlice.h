@@ -2,12 +2,13 @@
 
 #include "OpenGL/DisplayList.h"
 
+#include "SliceProcessing/Slice.h"
+
 void GetSlice(float sCenter, GLuint* bufferID, GLuint* textureID)
 {
 	printf("Extracting Fourier Slice ... \n"); 
 	
     GLuint displayList = OpenGL::setDisplayList(0, 1);
-    // SetDisplayList(sCenter);
 
 	// Render to Framebuffer Render Target 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
@@ -133,7 +134,7 @@ void GetSlice(float sCenter, GLuint* bufferID, GLuint* textureID)
 // Extract Slice from the 3D Spectrum 
 void GetSpectrumSlice()
 {
-    GetSlice(0, &mFBO_ID, &mSliceTextureSrcID);
+    Slice::GetSlice(0, 1, mXrot, mYrot, mZrot, &mSliceTextureSrcID, &mVolTexureID, mFBO_ID);
 
 	// Attach FBO 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
