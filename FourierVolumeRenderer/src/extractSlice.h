@@ -76,7 +76,10 @@ void GetSpectrumSlice()
     Slice::backTransformSlice(mRecImage, mImg_2D_Temp, mImg_2D,
     mSliceArrayComplex, mAbsoluteReconstructedImage);
 
-    UploadImage();
+    // UploadImage();
+
+    Slice::UploadImage(256,256, mRecImage, &mSliceTextureID);
+
 
 
 }
