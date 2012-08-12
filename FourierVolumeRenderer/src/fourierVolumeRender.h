@@ -205,11 +205,6 @@ float*	 	mAbsoluteReconstructedImage;
 float* 		mTextureArray;
 float* 		mFrameBufferArray;
 
-float* 		mFrameBufferArray_N2;
-float* 		mFrameBufferArray_N1;
-float* 		mFrameBufferArray_P1;
-float* 		mFrameBufferArray_P2;
-
 // OpenGL Texture IDs
 GLuint 		mVolTexureID;		// 3D Spectrum Texture ID
 GLuint		mSliceTextureID; 	// Extracted Slice ID
