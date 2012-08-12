@@ -4,28 +4,6 @@
 
 #include "SliceProcessing/Slice.h"
 
-
-void readBackSlice()
-{
-    // Attach FBO
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFBO_ID);
-    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
-
-    // Writing FBO Texture Components into mFrameBufferArray
-    glReadPixels(0,0, mSliceWidth, mSliceHeight, RG, GL_FLOAT, mFrameBufferArray);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-    printf("CPU Processing \n");
-
-    int ctr = 0;
-    for (int i = 0; i < (256 * 256 * 2); i += 2)
-    {
-        mSliceArrayComplex[ctr][0] = mFrameBufferArray[i];
-        mSliceArrayComplex[ctr][1] = mFrameBufferArray[i+1];
-        ctr++;
-    }
-}
-
 void backTransformSlice()
 {
 
@@ -87,13 +65,16 @@ void GetSpectrumSlice()
 {
     Slice::GetSlice(0, 1, mXrot, mYrot, mZrot, &mSliceTextureSrcID, &mVolTexureID, mFBO_ID);
 
-    readBackSlice();
+    Slice::readBackSlice(256,256, mFBO_ID, mFrameBufferArray, mSliceArrayComplex );
 
     // Filter CPU
     // ProcessSlice();
 
 
-    backTransformSlice();
+   // backTransformSlice();
+
+    Slice::backTransformSlice(mRecImage, mImg_2D_Temp, mImg_2D,
+    mSliceArrayComplex, mAbsoluteReconstructedImage);
 
     UploadImage();
 
