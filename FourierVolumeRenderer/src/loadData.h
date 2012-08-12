@@ -4,7 +4,7 @@
 
 void initVolumeData()
 {
-    printf("Loading dataSet ... \n");
+    printf("Loading dataSet \n");
 
     volume* iVolume = Loader::loadVolume(mPath);
     mVolumeData =  iVolume->ptrVol_char;
@@ -13,107 +13,8 @@ void initVolumeData()
 }
 
 
-volume* loadVolume(char* volFile, char* hdrFile)
-{
-    // Checking for the existance of the volume file
-    if (!volFile)
-    {
-        printf("Error finding the raw volume file %s \n", volFile);
-        exit(0);
-    }
-
-    // Checking for the existance of the header file
-    if (!hdrFile)
-    {
-        printf("Error finding the header file %s \n", hdrFile);
-        exit(0);
-    }
-
-    // Allocating volume structre
-    volume* iVolume = (volume*) malloc (sizeof(volume));
-
-    // Read the header file to get volume dimensions
-    iVolume->sizeX = mVolWidth;
-    iVolume->sizeY = mVolHeight;
-    iVolume->sizeZ = mVolDepth;
-
-    // Volume size in bytes
-    iVolume->volSizeBytes = sizeof(char) *
-            iVolume->sizeX * iVolume->sizeY * iVolume->sizeZ;
-
-    // Allocating volume
-    iVolume->ptrVol_char = (char*) malloc (iVolume->volSizeBytes);
-
-    // Open volume file
-    FILE* ptrFile = fopen(volFile, "rb");
-
-     // Double checking for the existance of the volume file
-    if (!ptrFile)
-    {
-        printf("Error finding the raw volume file %s \n", volFile);
-        exit(0);
-    }
-
-    // Read the volume file
-    size_t imageSize = fread(iVolume->ptrVol_char,
-                             BYTE,
-                             iVolume->volSizeBytes,
-                             ptrFile);
-
-    // Checking if the volume was loaded or not
-    if (!imageSize)
-    {
-        printf("Error readng the raw file %s \n", volFile);
-        exit(0);
-    }
-
-    return iVolume;
-}
 
 
-void InitData()
-{
-	printf("Loading DataSet ... \n"); 
-	if (mPath == 0) 
-    {
-		// sprintf("Error Finding File '%s' ... \n", mPath); 
-		exit(0); 
-	}
-	 
-	// Loading Data from File 
-	mVolumeData = LoadRawFile(mPath, mVolumeSizeBytes); 
-
-
-    volume* iVolume = loadVolume(mPath, mPath);
-    mVolumeData =  iVolume->ptrVol_char;
-	
-	printf("	DataSet Loaded Successfully \n\n");
-}
-
-
-
-
-
-// Loading Raw Data 
-char* LoadRawFile(char* fFileName, size_t fSize)
-{
-	FILE* fPtrFile; 
-	fPtrFile = fopen(fFileName, "rb"); 
-	
-	if (!fPtrFile)
-	{
-		fprintf(stderr, "Error Opening File '%s' ... \n", fFileName); 
-		exit(0); 
-	}
-	
-	// Memory Allocation  
-	char* fVolumeData = (char*) malloc (fSize); 
-	
-	// File Reading Operation 
-	size_t fFileSizeBytes = fread(fVolumeData, 1, fSize, fPtrFile); 
-	
-	return fVolumeData; 
-}
 
 void AllocateVolumeArrays()
 { 
