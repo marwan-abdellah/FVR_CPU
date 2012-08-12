@@ -100,10 +100,13 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Loader)
 LIST(APPEND SOURCES src/VolumeProcessing/volume.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/VolumeProcessing/)
 
-# Volume Processing
+# FFT Shift
 LIST(APPEND SOURCES src/FFTShift/FFTShift.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/FFTShift/)
 
+# Spectrum
+LIST(APPEND SOURCES src/SpectrumProcessing/Spectrum.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SpectrumProcessing/)
 
 
 # Include directories 

@@ -81,7 +81,6 @@ int main(int argc, char** argv)
 
     createFloatData();
 
-
 	// Wrapping Around Spatial Domain Data 
 	WrapAroundVolume(); 
 
