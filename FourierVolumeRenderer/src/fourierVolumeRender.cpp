@@ -79,8 +79,8 @@ int main(int argc, char** argv)
 
     extractVolume();
 
-	// Creating Float Data & Releasing Byte Data 	
-	CreateFloatData(); 
+    createFloatData();
+
 
 	// Wrapping Around Spatial Domain Data 
 	WrapAroundVolume(); 
