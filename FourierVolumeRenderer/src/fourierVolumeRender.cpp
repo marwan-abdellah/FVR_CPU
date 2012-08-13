@@ -3,7 +3,6 @@
 
 #include "SpectrumProcessing/Spectrum.h"
 
-#include "OpenGL/OpenGL.h"
 
 #include "shared.h"
 #include "Loader/loader.h"
@@ -13,13 +12,20 @@
 #include "WrappingAround/WrappingAround.h"
 
 #include "OpenGL/DisplayList.h"
-
+#include "OpenGL/OpenGL.h"
 #include "SliceProcessing/Slice.h"
 #include "FFTShift/FFTShift.h"
 
+#include "RenderingLoop/RenderingLoop.h"
 
-GLuint 		eVolumeTexture_ID;
-GLuint 		eSliceTexture_ID;
+
+GLuint eVolumeTexture_ID;
+GLuint eSliceTexture_ID;
+GLuint eImageTexture_ID;
+GLuint eFBO_ID;
+
+fftwf_complex* 	eSlice_complex;
+
 
 int mVolWidth			= 0;
 int mVolHeight			= 0;
@@ -37,7 +43,7 @@ float** 	mImg_2D_Temp;
 float***	mVol_3D;
 
 
-GLuint		mSliceTextureID; 	// Extracted Slice ID
+
 float mXrot = 0;
 float mYrot = 0;
 float mZrot = 0;
@@ -45,7 +51,7 @@ int mScalingFactor = 1;
 float trans = 0;
 
 // Framebuffer Object Globals
-GLuint mFBO_ID;
+
 
 char* 		mVolumeData;
 unsigned char*		mRecImage;
@@ -60,88 +66,76 @@ float* 		mFrameBufferArray;
 
 
 
-// FFTW Globals ____________________________________________________________*/
-fftwf_complex* 	mVolumeArrayComplex;
-fftwf_complex* 	mSliceArrayComplex;
+
 
 
 // Extract Slice from the 3D Spectrum
 void GetSpectrumSlice()
 {
-    Slice::GetSlice(0, 1, mXrot, mYrot, mZrot, &eSliceTexture_ID, &eVolumeTexture_ID, mFBO_ID);
 
-    // Creating FB Array to Recieve Data From FB Texture
-    mFrameBufferArray	= (float*) malloc (mSliceWidth * mSliceHeight * 2 * sizeof(float));
-
+//RenderingLoop::run(mXrot, mYrot, mZrot, 0, 1, 256, 256,
+  //                 &eSliceTexture_ID, &eVolumeTexture_ID, eFBO_ID, &eImageTexture_ID);
 
 
-    for (int i = 0; i < mSliceWidth * mSliceHeight * 2; i++)
+    int iSliceWidth = 256;
+    int iSliceHeight = 256;
+    /* @ Extrat the projection slice from the spectral volume texture */
+    Slice::GetSlice(0, 1, mXrot, mYrot, mZrot,
+                    &eSliceTexture_ID, &eVolumeTexture_ID, iFBO_ID);
+
+    /* @ Reading back the FBO after initialization */
+    float* eFB = (float*) malloc (iSliceWidth * iSliceHeight * sizeof(float));
+    fftwf_complex* eSlice_complex = (fftwf_complex*) fftwf_malloc
+            (iSliceWidth * iSliceHeight * sizeof(fftwf_complex));
+
+    for (int i = 0; i < iSliceWidth * iSliceHeight * 2; i++)
+        eFB[i] = 0;
+
+    Slice::readBackSlice(iSliceWidth, iSliceHeight, eFBO_ID, eFB, eSlice_complex );
+
+    unsigned char* eRecImage = ( unsigned char*) malloc (iSliceWidth * iSliceHeight * sizeof( unsigned char));
+    float* eRecImageAbsolute = (float*) malloc (iSliceWidth * iSliceHeight * sizeof(float));
+
+    /* 2D arrays for the wrapping around operations */
+    float** eImage_MAIN = (float**) malloc (iSliceWidth * sizeof(float*));
+    float** eImage_TEMP = (float**) malloc (iSliceWidth * sizeof(float*));
+    for (int i = 0; i < iSliceWidth; i++)
     {
-        mFrameBufferArray[i] = 0;
+        eImage_MAIN[i] = (float*) malloc(iSliceHeight * sizeof(float));
+        eImage_TEMP[i] = (float*) malloc(iSliceHeight * sizeof(float));
     }
 
-    // Extracted Slice in the Frequency Domain
-    mSliceArrayComplex = (fftwf_complex*) fftwf_malloc (mVolWidth * mVolHeight * sizeof(fftwf_complex));
+    /* @ Back transform the extracted slice to create the projection */
+    Slice::backTransformSlice(eRecImage, eImage_TEMP, eImage_MAIN,
+    eSlice_complex, eRecImageAbsolute);
 
+    /* @ Update the rendering context with the new image */
+    cOpenGL::updateSliceTexture(&eImageTexture_ID);
 
-    Slice::readBackSlice(256,256, mFBO_ID, mFrameBufferArray, mSliceArrayComplex );
-
-    // Reconstructed Absolute Image
-    mAbsoluteReconstructedImage = (float*) malloc (mVolWidth * mVolHeight * sizeof(float));
-
-    // Character Reconstructed Image
-    mRecImage = (unsigned char*) malloc (mVolWidth * mVolHeight * sizeof(unsigned char));
-
-    // Creating 2D Arrays
-    mImg_2D = (float**) malloc (mVolWidth * sizeof(float*));
-    for (int x = 0; x < mVolWidth; x++)
-    {
-        mImg_2D[x] = (float*) malloc(mVolHeight * sizeof(float));
-    }
-
-    mImg_2D_Temp = (float**) malloc (mVolWidth * sizeof(float*));
-    for (int x = 0; x < mVolWidth; x++)
-    {
-        mImg_2D_Temp[x] = (float*) malloc(mVolHeight * sizeof(float));
-    }
-
-    Slice::backTransformSlice(mRecImage, mImg_2D_Temp, mImg_2D,
-    mSliceArrayComplex, mAbsoluteReconstructedImage);
-
-
-    Slice::UploadImage(256,256, mRecImage, &mSliceTextureID);
-
+    /* @ Upload the image to the GPU */
+    Slice::UploadImage(iSliceWidth, iSliceHeight, eRecImage, &eImageTexture_ID);
 
 
 }
 
 int main(int argc, char** argv)
 { 	
-    printf("Initializing Variables ... \n\n");
+    // Volume Attributes
+    mVolWidth			= 256;
+    mVolHeight			= 256;
+    mVolDepth			= 256;
+    mUniDim 			= 256;
 
-        // Volume Attributes
-        mVolWidth			= 256;
-        mVolHeight			= 256;
-        mVolDepth			= 256;
-        mUniDim 			= 256;
-
-        mVolumeSize 		= mVolWidth * mVolHeight * mVolDepth;
-        mVolumeSizeBytes	= mVolumeSize * sizeof(char);
+    mVolumeSize 		= mVolWidth * mVolHeight * mVolDepth;
+    mVolumeSizeBytes	= mVolumeSize * sizeof(char);
 
 
-        // Slice Attributes
-        mSliceWidth 	= mVolWidth;
-        mSliceHeight 	= mVolHeight;
-        mSliceSize = mSliceWidth * mSliceHeight;
+    // Slice Attributes
+    mSliceWidth 	= mVolWidth;
+    mSliceHeight 	= mVolHeight;
+    mSliceSize = mSliceWidth * mSliceHeight;
 
-
-
-
-	// Initializing OpenGL Contex
-	// First Initialize OpenGL Context, So We Can Properly Set the GL for CUDA.
-    	// This is Necessary in order to Achieve Optimal Performance with OpenGL/CUDA Interop.
-
-        cOpenGL::InitOpenGLContext(argc, argv);
+    cOpenGL::InitOpenGLContext(argc, argv);
 
     /* @ Loading the input volume dataset */
     volume* eVolume_char = Loader::loadVolume(eVolPath);
@@ -182,23 +176,21 @@ int main(int argc, char** argv)
 
     /* @ Uploading the spectrum to the GPU texture */
     Spectrum::UploadSpectrumTexture(&eVolumeTexture_ID, eSpectrumTexture, &eOriginalDim);
-	
-	// We Don't Need Float Data Ayn More As It Resides in the GPU Texture Memory	
+
     free(eVolumeData_float);
 	
-	// OpenGL Initialization 
+    /* @ OpenGL initialization */
     cOpenGL::initOpenGL();
 	
-	// Creating & Binding Slice Textures (Src & Destination) 	
-    Slice::CreateSliceTextureSrc(256, 256, &eSliceTexture_ID);
+    /* @ Creating the projection slice texture & binding it */
+    Slice::createSliceTexture(256, 256, &eSliceTexture_ID);
 	
-	// Preparing FBO & Its Associated Texture Getting Ready to Slice 3D Texture 
-    OpenGL::PrepareFBO(&mFBO_ID, &eSliceTexture_ID);
+    /* @ Prepare the FBO & attaching the slice texture to it */
+    cOpenGL::prepareFBO(&eFBO_ID, &eSliceTexture_ID);
 	
 	// Render Slice to FB Texture & Save It into Array	
 	GetSpectrumSlice(); 
-     
-	printf("Start Rendering Mainloop ..... \n");
+
 	glutMainLoop(); 
 	return 0;
 }

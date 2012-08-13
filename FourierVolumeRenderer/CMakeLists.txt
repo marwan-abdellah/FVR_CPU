@@ -104,6 +104,10 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SliceProcessing/)
 LIST(APPEND SOURCES src/WrappingAround/WrappingAround.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/WrappingAround/)
 
+# Rendering Loop
+LIST(APPEND SOURCES src/RenderingLoop/RenderingLoop.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/RenderingLoop/)
+
 
 # Include directories 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})

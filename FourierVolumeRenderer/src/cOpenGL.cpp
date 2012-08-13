@@ -38,6 +38,27 @@ else
 }
 }
 
+GLuint* cGL_ImageTexture_ID;
+
+void cOpenGL::updateSliceTexture(GLuint* iImageTexture_ID)
+{
+    cGL_ImageTexture_ID = iImageTexture_ID;
+}
+
+void cOpenGL::prepareFBO(GLuint* iFBO_ID, GLuint* iSliceTexture_ID)
+{
+    printf("Preparing FrameBuffer Object & Its Associated Texture \n");
+
+    glGenFramebuffersEXT(1, iFBO_ID);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, *iFBO_ID);
+
+    // Attach Texture to FBO Color Attachement Point
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, *iSliceTexture_ID, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+    printf("	Frame Buffer Preparation Done Successfully \n\n");
+}
+
 void cOpenGL::InitOpenGLContext(int argc, char** argv)
 {
     printf ("Initializing OpenGL Contex ... \n");
@@ -99,15 +120,11 @@ CUTBoolean cOpenGL::CheckOpenGLExtensions()
 
 void cOpenGL::initOpenGL()
 {
-    printf("Initializing OpenGL ... \n");
-
-    // Clearing Buffer
+    /* @ Clearing color buffer */
     glClearColor (0.0, 0.0, 0.0, 0.0);
 
-    // Pixel Storage Mode
+    /* Setting the pixel storage mode */
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    printf("	Initializing OpenGL Done \n\n");
 }
 
 void cOpenGL::DisplayGL()
@@ -118,7 +135,7 @@ void cOpenGL::DisplayGL()
     glDisable(GL_DEPTH_TEST);
 
     // Binding Slice Texture to be Displayed On OpenGL Quad
-    glBindTexture(GL_TEXTURE_2D, mSliceTextureID);
+    glBindTexture(GL_TEXTURE_2D, *cGL_ImageTexture_ID);
     glEnable(GL_TEXTURE_2D);
 
     // Slice Texture Parameters
@@ -184,27 +201,27 @@ void cOpenGL::KeyBoard(unsigned char fKey, int fX, int fY)
             break;
         case 'Q':
             mXrot += 5.0;
-            printf("Rotating %f around mLoop ... \n", (float) mXrot);
+            printf("Rotating %d around mLoop ... \n", (float) mXrot);
             break;
         case 'q':
             mXrot -= 5.0;
-            printf("Rotating %f around mLoop ... \n", (float) mXrot);
+            printf("Rotating %d around mLoop ... \n", (float) mXrot);
             break;
         case 'W':
             mYrot += 5.0;
-            printf("Rotating %f around Y ... \n", (float) mYrot);
+            printf("Rotating %d around Y ... \n", (float) mYrot);
             break;
         case 'w':
             mYrot -= 5.0;
-            printf("Rotating %f around Y ... \n", (float) mYrot);
+            printf("Rotating %d around Y ... \n", (float) mYrot);
             break;
         case 'E':
             mZrot += 5.0;
-            printf("Rotating %f around Z ... \n", (float) mZrot);
+            printf("Rotating %d around Z ... \n", (float) mZrot);
             break;
         case 'e':
             mZrot -= 5.0;
-            printf("Rotating %f around Z ... \n", (float) mZrot);
+            printf("Rotating %d around Z ... \n", (float) mZrot);
             break;
         case ' ':
 
@@ -212,42 +229,42 @@ void cOpenGL::KeyBoard(unsigned char fKey, int fX, int fY)
 
         case 'R':
             sVal = sVal * 10;
-            printf("sVal %f \n", sVal);
+            printf("sVal %d \n", sVal);
             break;
 
         case 'r':
             sVal = sVal / 10;
-            printf("sVal %f \n", sVal);
+            printf("sVal %d \n", sVal);
             break;
 
         case 'o':
             trans = trans + 1;
-            printf("trans : %f/256 \n", trans);
+            printf("trans : %d/256 \n", trans);
             break;
 
         case 'p':
             trans = trans - 1;
-            printf("trans : %f/256 \n", trans);
+            printf("trans : %d/256 \n", trans);
             break;
 
         case 's':
             mScalingFactor *= 5;
-            printf("mScalingFactor : %f \n", mScalingFactor);
+            printf("mScalingFactor : %d \n", mScalingFactor);
             break;
 
         case 'S':
             mScalingFactor /= 5;
-            printf("mScalingFactor : %f \n", mScalingFactor);
+            printf("mScalingFactor : %d \n", mScalingFactor);
             break;
 
         case 'a':
             mScalingFactor += 10;
-            printf("mScalingFactor : %f \n", mScalingFactor);
+            printf("mScalingFactor : %d \n", mScalingFactor);
             break;
 
         case 'A':
             mScalingFactor -= 10;
-            printf("mScalingFactor : %f \n", mScalingFactor);
+            printf("mScalingFactor : %d \n", mScalingFactor);
             break;
 
         case 'z' : mImageScale += 0.5;

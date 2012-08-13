@@ -21,7 +21,7 @@ using namespace std;
 
 #define OFFSET(i) ((char *)NULL + (i))
 
-extern  GLuint		mSliceTextureID; 	// Extracted Slice ID
+// extern  GLuint		mSliceTextureID; 	// Extracted Slice ID
 
 namespace cOpenGL
 {
@@ -36,6 +36,9 @@ namespace cOpenGL
     void Mouse(int fButton, int fState, int fX, int fY);
     void MouseMotion(int fX, int fY);
     void RegisterOpenGLCallBacks();
+
+    void prepareFBO(GLuint* iFBO_ID, GLuint* iSliceTexture_ID);
+    void updateSliceTexture(GLuint* iImageTexture_ID);
 }
 
 #endif // COPENGL_H

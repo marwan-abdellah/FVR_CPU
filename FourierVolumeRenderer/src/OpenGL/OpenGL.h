@@ -21,7 +21,7 @@ namespace OpenGL
     void MouseMotion(int fX, int fY);
     void OpenGLRegisterOpenGLCallBacks();
     void updateImageTexture(GLuint* newImageTexture_ID);
-    void PrepareFBO(GLuint* FBO_ID, GLuint* sliceTexture);
+    void prepareFBO(GLuint* iFBO_ID, GLuint* iSliceTexture);
 
 
 }
