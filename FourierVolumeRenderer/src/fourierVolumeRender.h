@@ -117,11 +117,12 @@ char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData";
 
 // OpenGL Globals  _________________________________________________________*/
 // Rotation Parameters
-int mXrot			= -0;
-int mYrot			= -0;
-int mZrot			= 0;
-int mScalingFactor 	= 25;
-float trans = 0;
+ float mXrot = 0;
+ float mYrot = 0;
+ float mZrot = 0;
+ int mScalingFactor = 1;
+ float trans = 0;
+  GLuint		mSliceTextureID; 	// Extracted Slice ID
 
 
 // Forward Declarations __________________________________________________________________________*/ 
@@ -134,8 +135,7 @@ void initOpenGL();
 
 
 
-GLuint		mSliceTextureID; 	// Extracted Slice ID
-void GetSpectrumSlice();
+extern void GetSpectrumSlice();
 
 
 

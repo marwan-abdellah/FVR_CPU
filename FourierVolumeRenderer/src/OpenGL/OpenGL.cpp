@@ -4,8 +4,8 @@
 #include <GL/glut.h>
 #include "shared.h"
 
-extern void GetSpectrumSlice();
 
+extern void GetSpectrumSlice();
 
 
 void OpenGL::PrepareFBO(GLuint* FBO_ID, GLuint* sliceTexture)
@@ -41,7 +41,8 @@ void OpenGL::InitOpenGLContext(int argc, char** argv)
 
 }
 
-
+extern void GetSpectrumSlice();
+extern  GLuint		mSliceTextureID; 	// Extracted Slice ID
 GLuint* imageTexure_ID;
 
 namespace OpenGL
@@ -53,10 +54,10 @@ namespace OpenGL
     int rot_Z = 0;
     int scaleFactor = 1;
 
-    float mXrot = 0;
-    float mYrot = 0;
-    float mZrot = 0;
-    int mScalingFactor = 1;
+    extern float mXrot = 0;
+    extern float mYrot = 0;
+    extern float mZrot = 0;
+    extern int mScalingFactor = 1;
     int sVal;
 
     int sWindowWidth;

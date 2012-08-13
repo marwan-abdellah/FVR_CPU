@@ -73,10 +73,7 @@ INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR})
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 SET(SOURCES src/fourierVolumeRender.cpp
-src/contextOpenGL.h
-src/fourierVolumeRender.cpp
-src/fourierVolumeRender.h
-src/wrapAround.h)
+src/contextOpenGL.h)
 
 # Loader
 LIST(APPEND SOURCES src/Loader/loader.cpp)

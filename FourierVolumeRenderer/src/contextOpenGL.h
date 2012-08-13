@@ -1,18 +1,22 @@
 #include "fourierVolumeRender.h"
 
+
 int sWindowWidth;
 int sWindowHeight; 
 
 float mImageScale = 2; 
 
-   float sVal = 1.0;
+float sVal = 1.0;
 
-   int mWindowWidth		= 512;
-   int mWindowHeight		= 512;
+int mWindowWidth		= 512;
+int mWindowHeight		= 512;
 
-   // OpenGL Versioning Functions _____________________________________________*/
-   CUTBoolean CheckOpenGLExtensions();
-   void initGlut(int argc, char** argv);
+
+extern void GetSpectrumSlice();
+
+// OpenGL Versioning Functions _____________________________________________*/
+CUTBoolean CheckOpenGLExtensions();
+void initGlut(int argc, char** argv);
 
 
 // OpenGL Contetx Function _________________________________________________*/
@@ -61,11 +65,11 @@ void initGlut(int argc, char** argv)
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(mWindowWidth, mWindowHeight);
+    glutInitWindowSize(512, 512);
 	glutCreateWindow("Fourier Volume Rendering on CUDA");
 	
 	printf("	Display Mode		: GLUT_RGBA | GLUT_DOUBLE \n");
-	printf("	GLUT Windows Size	: %d mLoop %d \n \n", mWindowWidth, mWindowHeight);	
+    printf("	GLUT Windows Size	: %d mLoop %d \n \n", 512, 512);
 }
 
 CUTBoolean CheckOpenGLExtensions()

@@ -12,7 +12,6 @@
 
 
 
-
 #include "OpenGL/DisplayList.h"
 
 #include "SliceProcessing/Slice.h"
@@ -51,6 +50,7 @@ float* 		mFrameBufferArray;
 GLuint 		mVolTexureID;		// 3D Spectrum Texture ID
 
 GLuint 		mSliceTextureSrcID; 	// Input Texture to CUDA ID
+
 
 
 
@@ -159,7 +159,7 @@ void UploadImage()
 }
 
 // Extract Slice from the 3D Spectrum
-void GetSpectrumSlice()
+extern void GetSpectrumSlice()
 {
     Slice::GetSlice(0, 1, mXrot, mYrot, mZrot, &mSliceTextureSrcID, &mVolTexureID, mFBO_ID);
 
@@ -276,6 +276,8 @@ void SendSpectrumTextureToGPU()
     iVolDim.size_X = 256;
     iVolDim.size_Y = 256;
     iVolDim.size_Z = 256;
+
+
     Spectrum::UploadSpectrumTexture(&mVolTexureID, mTextureArray, &iVolDim);
 }
 
@@ -304,7 +306,9 @@ int main(int argc, char** argv)
 	// Initializing OpenGL Contex
 	// First Initialize OpenGL Context, So We Can Properly Set the GL for CUDA.
     	// This is Necessary in order to Achieve Optimal Performance with OpenGL/CUDA Interop.
-    InitOpenGLContext(argc, argv);
+
+        InitOpenGLContext(argc, argv);
+
 
     initVolumeData();
 
