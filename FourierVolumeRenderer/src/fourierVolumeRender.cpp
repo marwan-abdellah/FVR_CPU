@@ -1,5 +1,5 @@
 #include "fourierVolumeRender.h"
-#include "contextOpenGL.h"
+#include "cOpenGL.h"
 
 #include "SpectrumProcessing/Spectrum.h"
 
@@ -33,6 +33,14 @@ int mSliceSize			= 0;
 float** 	mImg_2D;
 float** 	mImg_2D_Temp;
 float***	mVol_3D;
+
+
+GLuint		mSliceTextureID; 	// Extracted Slice ID
+float mXrot = 0;
+float mYrot = 0;
+float mZrot = 0;
+int mScalingFactor = 1;
+float trans = 0;
 
 // Framebuffer Object Globals
 GLuint mFBO_ID;
@@ -159,7 +167,7 @@ void UploadImage()
 }
 
 // Extract Slice from the 3D Spectrum
-extern void GetSpectrumSlice()
+void GetSpectrumSlice()
 {
     Slice::GetSlice(0, 1, mXrot, mYrot, mZrot, &mSliceTextureSrcID, &mVolTexureID, mFBO_ID);
 
@@ -307,7 +315,7 @@ int main(int argc, char** argv)
 	// First Initialize OpenGL Context, So We Can Properly Set the GL for CUDA.
     	// This is Necessary in order to Achieve Optimal Performance with OpenGL/CUDA Interop.
 
-        InitOpenGLContext(argc, argv);
+        cOpenGL::InitOpenGLContext(argc, argv);
 
 
     initVolumeData();
@@ -335,7 +343,7 @@ int main(int argc, char** argv)
     free(mVolumeDataFloat);
 	
 	// OpenGL Initialization 
-	initOpenGL(); 
+    cOpenGL::initOpenGL();
 	
 	// Creating & Binding Slice Textures (Src & Destination) 	
     Slice::CreateSliceTextureSrc(256, 256, &mSliceTextureSrcID);
