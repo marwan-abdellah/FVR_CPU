@@ -1,6 +1,34 @@
 #include "RenderingLoop.h"
 #include "cOpenGL.h"
 
+
+float* eFB;
+fftwf_complex* eSlice_complex;
+unsigned char* eRecImage;
+float* eRecImageAbsolute;
+float** eImage_MAIN;
+float** eImage_TEMP;
+
+void RenderingLoop::prepareRenderingArray(int iSliceWidth, int iSliceHeight)
+{
+    /* @ Reading back the FBO after initialization */
+    eFB = (float*) malloc (iSliceWidth * iSliceHeight * sizeof(float));
+    eSlice_complex = (fftwf_complex*) fftwf_malloc
+            (iSliceWidth * iSliceHeight * sizeof(fftwf_complex));
+
+    eRecImage = (unsigned char*) malloc (iSliceWidth * iSliceHeight * sizeof(char));
+    eRecImageAbsolute = (float*) malloc (iSliceWidth * iSliceHeight * sizeof(float));
+
+    /* 2D arrays for the wrapping around operations */
+    eImage_MAIN = (float**) malloc (iSliceWidth * sizeof(float*));
+    eImage_TEMP = (float**) malloc (iSliceWidth * sizeof(float*));
+    for (int i = 0; i < iSliceWidth; i++)
+    {
+        eImage_MAIN[i] = (float*) malloc(iSliceHeight * sizeof(float));
+        eImage_TEMP[i] = (float*) malloc(iSliceHeight * sizeof(float));
+    }
+}
+
 void RenderingLoop::run(float iRot_X, float iRot_Y, float iRot_Z,
                         float iSliceCenter, float iSliceSideLength,
                         int iSliceWidth, int iSliceHeight,
@@ -13,27 +41,14 @@ void RenderingLoop::run(float iRot_X, float iRot_Y, float iRot_Z,
     Slice::GetSlice(iSliceCenter, iSliceSideLength, iRot_X, iRot_Y, iRot_Z,
                     iSliceTexture_ID, iVolumeTexture_ID, iFBO_ID);
 
-    /* @ Reading back the FBO after initialization */
-    float* eFB = (float*) malloc (iSliceWidth * iSliceHeight * sizeof(float));
-    fftwf_complex* eSlice_complex = (fftwf_complex*) fftwf_malloc
-            (iSliceWidth * iSliceHeight * sizeof(fftwf_complex));
-
     for (int i = 0; i < iSliceWidth * iSliceHeight * 2; i++)
         eFB[i] = 0;
 
-    Slice::readBackSlice(iSliceWidth, iSliceHeight, iFBO_ID, eFB, eSlice_complex );
+    // Extracted Slice in the Frequency Domain
+    eSlice_complex = (fftwf_complex*) fftwf_malloc (256 * 256 * sizeof(fftwf_complex));
 
-    unsigned char* eRecImage = ( unsigned char*) malloc (iSliceWidth * iSliceHeight * sizeof( unsigned char));
-    float* eRecImageAbsolute = (float*) malloc (iSliceWidth * iSliceHeight * sizeof(float));
+    Slice::readBackSlice(iSliceWidth, iSliceHeight, iFBO_ID, eFB, eSlice_complex);
 
-    /* 2D arrays for the wrapping around operations */
-    float** eImage_MAIN = (float**) malloc (iSliceWidth * sizeof(float*));
-    float** eImage_TEMP = (float**) malloc (iSliceWidth * sizeof(float*));
-    for (int i = 0; i < iSliceWidth; i++)
-    {
-        eImage_MAIN[i] = (float*) malloc(iSliceHeight * sizeof(float));
-        eImage_TEMP[i] = (float*) malloc(iSliceHeight * sizeof(float));
-    }
 
     /* @ Back transform the extracted slice to create the projection */
     Slice::backTransformSlice(eRecImage, eImage_TEMP, eImage_MAIN,

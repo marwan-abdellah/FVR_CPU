@@ -195,9 +195,8 @@ void Slice::backTransformSlice(unsigned char *RecImage, float** Img_2D_Temp, flo
 
     for (int i = 0; i < 256 * 256; i++)
     {
-        RecImage[i] = (unsigned char)(AbsoluteReconstructedImage[i]);
+        RecImage[i] = (char)(AbsoluteReconstructedImage[i]);
     }
-
 }
 
 

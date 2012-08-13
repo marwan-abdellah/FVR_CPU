@@ -72,16 +72,15 @@ LINK_LIBRARIES(${GLEW_LIB})
 INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR})
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
-SET(SOURCES src/fourierVolumeRender.cpp
-src/cOpenGL.cpp)
+SET(SOURCES src/FourierVolumeRenderer.cpp)
 
 # Loader
-LIST(APPEND SOURCES src/Loader/loader.cpp)
+LIST(APPEND SOURCES src/Loader/Loader.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Loader)
 
 # OpenGL
 LIST(APPEND SOURCES src/OpenGL/DisplayList.cpp)
-LIST(APPEND SOURCES src/OpenGL/OpenGL.cpp)
+LIST(APPEND SOURCES src/OpenGL/cOpenGL.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OpenGL)
 
 # Volume Processing
