@@ -3,7 +3,7 @@
 
 
 // Type Definitions _______________________________________________________________________________*/ 
-char* mPath = "/home/abdellah/Software/DataSets/CTData/CTData";
+char* eVolPath = "/home/abdellah/Software/DataSets/CTData/CTData";
 
 #endif // _FOURIER_VOLUME_RENDER_H_
 

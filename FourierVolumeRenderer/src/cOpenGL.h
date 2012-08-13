@@ -21,14 +21,6 @@ using namespace std;
 
 #define OFFSET(i) ((char *)NULL + (i))
 
-
-
-// OpenGL Globals  _________________________________________________________*/
-// Rotation Parameters
-
-
-
-
 extern  GLuint		mSliceTextureID; 	// Extracted Slice ID
 
 namespace cOpenGL

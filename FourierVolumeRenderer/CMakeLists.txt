@@ -96,9 +96,13 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/FFTShift/)
 LIST(APPEND SOURCES src/SpectrumProcessing/Spectrum.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SpectrumProcessing/)
 
-# Spectrum
+# Slice Processing
 LIST(APPEND SOURCES src/SliceProcessing/Slice.cpp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SliceProcessing/)
+
+# Wrapping around
+LIST(APPEND SOURCES src/WrappingAround/WrappingAround.cpp)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/WrappingAround/)
 
 
 # Include directories 
